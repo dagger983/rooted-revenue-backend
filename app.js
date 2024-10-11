@@ -4,7 +4,6 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
 
-
 const app = express();
 const port = process.env.PORT || 3306;
 
@@ -20,8 +19,8 @@ app.use(cors({
 // MySQL Connection Pool
 const pool = mysql.createPool({
   connectionLimit: 10,
-  host:"bain5b6uljkqvousa9i8-mysql.services.clever-cloud.com",
-  user:"u0larcw41pjyvzhp",
+  host: "bain5b6uljkqvousa9i8-mysql.services.clever-cloud.com",
+  user: "u0larcw41pjyvzhp",
   password: "b2axJmnk8UfG8rbCnH8u",
   database: "bain5b6uljkqvousa9i8",
 });
@@ -88,6 +87,17 @@ app.post("/login", async (req, res) => {
       console.error("Error comparing passwords: ", error);
       return res.status(500).json({ message: "Error comparing passwords" });
     }
+  });
+});
+
+// Admin Endpoint to View Users Data
+app.get("/admin", (req, res) => {
+  pool.query("SELECT * FROM users", (err, results) => {
+    if (err) {
+      console.error("Database query error: ", err);
+      return res.status(500).json({ message: "Server error during database query.", error: err });
+    }
+    res.json(results);
   });
 });
 
