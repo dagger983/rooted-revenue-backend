@@ -3,7 +3,10 @@ const mysql = require("mysql");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
-const catalyst = require("zcatalyst-sdk-node");
+const dotenv = require("dotenv"); // For environment variables
+
+dotenv.config(); // Load environment variables
+
 const app = express();
 const port = process.env.PORT || 3306;
 
@@ -20,10 +23,10 @@ app.use(
 
 // MySQL Connection
 const db = mysql.createConnection({
-  host: "bain5b6uljkqvousa9i8-mysql.services.clever-cloud.com",
-  user: "u0larcw41pjyvzhp",
-  password: "b2axJmnk8UfG8rbCnH8u",
-  database: "bain5b6uljkqvousa9i8"
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
 });
 
 db.connect(err => {
@@ -38,25 +41,39 @@ db.connect(err => {
 app.post("/register", async (req, res) => {
   const { username, mobileNo, password } = req.body;
 
+  // Basic validation
+  if (!username || !mobileNo || !password) {
+    return res.status(400).send("All fields are required");
+  }
+
   // Check if mobileNo already exists
   db.query("SELECT * FROM users WHERE mobileNo = ?", [mobileNo], async (err, results) => {
     if (err) return res.status(500).send("Server error");
     if (results.length > 0) return res.status(400).send("Mobile number already exists");
 
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    try {
+      // Hash the password
+      const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Insert new user
-    db.query("INSERT INTO users (username, mobileNo, password) VALUES (?, ?, ?)", [username, mobileNo, hashedPassword], (err, results) => {
-      if (err) return res.status(500).send("Server error");
-      res.status(201).send("User registered successfully");
-    });
+      // Insert new user
+      db.query("INSERT INTO users (username, mobileNo, password) VALUES (?, ?, ?)", [username, mobileNo, hashedPassword], (err) => {
+        if (err) return res.status(500).send("Server error");
+        res.status(201).send("User registered successfully");
+      });
+    } catch (error) {
+      res.status(500).send("Error hashing password");
+    }
   });
 });
 
 // Login API
-app.post("/login", (req, res) => {
+app.post("/login", async (req, res) => {
   const { mobileNo, password } = req.body;
+
+  // Basic validation
+  if (!mobileNo || !password) {
+    return res.status(400).send("All fields are required");
+  }
 
   // Check if mobileNo exists
   db.query("SELECT * FROM users WHERE mobileNo = ?", [mobileNo], async (err, results) => {
@@ -65,12 +82,15 @@ app.post("/login", (req, res) => {
 
     const user = results[0];
 
-    // Compare password
-    const match = await bcrypt.compare(password, user.password);
-    if (!match) return res.status(400).send("Invalid password");
+    try {
+      // Compare password
+      const match = await bcrypt.compare(password, user.password);
+      if (!match) return res.status(400).send("Invalid password");
 
-   
-    res.send("Login successful"); 
+      res.send("Login successful");
+    } catch (error) {
+      res.status(500).send("Error comparing passwords");
+    }
   });
 });
 
