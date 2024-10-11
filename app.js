@@ -3,9 +3,7 @@ const mysql = require("mysql");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
-const dotenv = require("dotenv");
 
-dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3306;
@@ -22,10 +20,10 @@ app.use(cors({
 // MySQL Connection Pool
 const pool = mysql.createPool({
   connectionLimit: 10,
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
+  host:bain5b6uljkqvousa9i8-mysql.services.clever-cloud.com,
+  user:u0larcw41pjyvzhp,
+  password: b2axJmnk8UfG8rbCnH8u,
+  database: bain5b6uljkqvousa9i8,
 });
 
 // Registration Endpoint
