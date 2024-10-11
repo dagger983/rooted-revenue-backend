@@ -20,10 +20,10 @@ app.use(cors({
 // MySQL Connection Pool
 const pool = mysql.createPool({
   connectionLimit: 10,
-  host:bain5b6uljkqvousa9i8-mysql.services.clever-cloud.com,
-  user:u0larcw41pjyvzhp,
-  password: b2axJmnk8UfG8rbCnH8u,
-  database: bain5b6uljkqvousa9i8,
+  host:"bain5b6uljkqvousa9i8-mysql.services.clever-cloud.com",
+  user:"u0larcw41pjyvzhp",
+  password: "b2axJmnk8UfG8rbCnH8u",
+  database: "bain5b6uljkqvousa9i8",
 });
 
 // Registration Endpoint
