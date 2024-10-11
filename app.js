@@ -37,8 +37,6 @@ db.connect(err => {
   console.log("Connected to database.");
 });
 
-// Registration API
-// Improved Registration API
 app.post("/register", async (req, res) => {
   const { username, mobileNo, password } = req.body;
 
@@ -47,7 +45,7 @@ app.post("/register", async (req, res) => {
     db.query("SELECT * FROM users WHERE mobileNo = ?", [mobileNo], async (err, results) => {
       if (err) {
         console.error("Database query error: ", err);
-        return res.status(500).json({ message: "Server error during database query." });
+        return res.status(500).json({ message: "Server error during database query.", error: err });
       }
       if (results.length > 0) {
         return res.status(400).json({ message: "Mobile number already exists" });
@@ -61,7 +59,7 @@ app.post("/register", async (req, res) => {
         [username, mobileNo, hashedPassword], (err) => {
           if (err) {
             console.error("Error inserting user: ", err);
-            return res.status(500).json({ message: "Server error during user registration." });
+            return res.status(500).json({ message: "Server error during user registration.", error: err });
           }
           res.status(201).json({ message: "User registered successfully" });
         }
@@ -72,6 +70,7 @@ app.post("/register", async (req, res) => {
     res.status(500).json({ message: "Unexpected server error." });
   }
 });
+
 
 
 // Login API
